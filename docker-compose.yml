@@ -14,7 +14,7 @@ services:
 
 
   app:
-    build: hashfish:latest
+    image: hashfish:latest
     container_name: hashfish
     environment:
       DB_HOST: db  # MariaDB 서비스의 이름을 사용해야 합니다.

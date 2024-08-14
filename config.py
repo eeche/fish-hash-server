@@ -11,7 +11,9 @@ if not os.path.isfile(config_path) or os.path.getsize(config_path) == 0:
     conf['log']  = os.environ.get('LOG_LVL', 'info')
     conf['master_email'] = os.environ.get('MASTER_EMAIL', 'default_email@example.com')
     conf['master_apikey'] = os.environ.get('MASTER_APIKEY', 'default_apikey')
-
+    conf['dbhost'] = os.environ.get('DB_HOST', 'db')
+    conf['dbuser'] = os.environ.get('DB_USER', 'root')
+    conf['dbname'] = os.environ.get('DB_NAME', 'bob')
     os.makedirs(os.path.dirname(config_path), exist_ok=True)  # 디렉토리가 없으면 생성
     with open(config_path, 'w') as newconf:
         json.dump(conf, newconf, indent=4)
@@ -27,7 +29,10 @@ with open(config_path, 'r') as mainconf:
         conf['log']  = os.environ.get('LOG_LVL', 'info')
         conf['master_email'] = os.environ.get('MASTER_EMAIL', 'default_email@example.com')
         conf['master_apikey'] = os.environ.get('MASTER_APIKEY', 'default_apikey')
-
+        conf['dbhost'] = os.environ.get('DB_HOST', 'db')
+        conf['dbuser'] = os.environ.get('DB_USER', 'root')
+        conf['dbname'] = os.environ.get('DB_NAME', 'bob')
+        
         with open(config_path, 'w') as newconf:
             json.dump(conf, newconf, indent=4)
 

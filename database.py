@@ -5,8 +5,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from config import conf
 
 DB_PASSWORD = conf['dbpassword']
+DB_HOST = conf['dbhost']
+DB_USER = conf['dbuser']
+DB_NAME = conf['dbname']
 
-DB_CONN= f'mysql+pymysql://root:{DB_PASSWORD}@db:3306/bob'
+
+DB_CONN= f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
 
 class SQLAlchemy():
     def __init__(self):
