@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-DB_PASSWORD = os.getenv('dbpassword')
-DB_HOST = os.getenv('dbhost')
-DB_USER = os.getenv('dbuser')
-DB_NAME = os.getenv('dbname')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_HOST = os.getenv('DB_HOST')
+DB_USER = os.getenv('DB_USER')
+DB_NAME = os.getenv('DB_NAME')
 
 DB_CONN = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
 
