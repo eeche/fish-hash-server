@@ -40,7 +40,7 @@ async def get_api_key(email: schema.UserEmail, db: Session = Depends(db.get_sess
         return {"email": new_user.email, "api_key": new_user.apikey}
 
 
-@app.post("/verify-docker-hash/")
+@app.post("/api/verify-docker-hash/")
 async def verify_docker_hash(data: schema.DockerHashRequest, db: Session = Depends(db.get_session)):
     # 1. UserTable에서 apikey가 매칭되는지 확인
     db_user = crud.get_user_by_apikey(db, apikey=data.apikey)
@@ -61,7 +61,7 @@ async def verify_docker_hash(data: schema.DockerHashRequest, db: Session = Depen
         return {"status": "Hash does not match", "match": False}
 
 
-@app.post("/register-docker-hash/")
+@app.post("/api/register-docker-hash/")
 async def register_docker_hash(data: schema.DockerHashRequest, db: Session = Depends(db.get_session)):
     # 1. UserTable에서 apikey가 존재하는지 확인
     db_user = crud.get_user_by_apikey(db, apikey=data.apikey)
