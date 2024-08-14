@@ -2,15 +2,17 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
-from config import conf
+from dotenv import load_dotenv
 
-DB_PASSWORD = conf['dbpassword']
-DB_HOST = conf['dbhost']
-DB_USER = conf['dbuser']
-DB_NAME = conf['dbname']
+# Load environment variables from .env file
+load_dotenv()
 
+DB_PASSWORD = os.getenv('dbpassword')
+DB_HOST = os.getenv('dbhost')
+DB_USER = os.getenv('dbuser')
+DB_NAME = os.getenv('dbname')
 
-DB_CONN= f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
+DB_CONN = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
 
 class SQLAlchemy():
     def __init__(self):
