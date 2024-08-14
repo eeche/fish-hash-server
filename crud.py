@@ -39,8 +39,13 @@ def update_user_api_key(db: Session, email: str, api_key: str):
         return db_user
     return None
 
-def get_user_by_email_and_apikey(db: Session, email: str, apikey: str):
-    return db.query(models.UserTable).filter(models.UserTable.email == email, models.UserTable.apikey == apikey).first()
+#  모든 docker관련 api는 email이 필요없음
+#  register docker_image로 등록하는 api => 이미지 명 같든 틀리든 무조건 overwrite
+#  verify는 api_key, docker_image_name, docker_image_hash로 검증함
+#  
 
-def get_fishhash_by_email_and_docker_name(db: Session, email: str, docker_image_name: str):
-    return db.query(models.FishHash).filter(models.FishHash.email == email, models.FishHash.docker_image_name == docker_image_name).first()
+def get_user_by_apikey(db: Session, apikey: str):
+    return db.query(models.UserTable).filter(models.UserTable.apikey == apikey).first()
+
+def get_fishhash_by_apikey_and_docker_name(db: Session, apikey: str, docker_image_name: str):
+    return db.query(models.FishHash).filter(models.FishHash.apikey == apikey, models.FishHash.docker_image_name == docker_image_name).first()

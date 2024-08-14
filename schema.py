@@ -41,7 +41,6 @@ class UserEmail(BaseModel):
         orm_mode = True
 
 class DockerHashRequest(BaseModel):
-    email: str
     apikey: str
     docker_image_name: str
     docker_image_hash: str

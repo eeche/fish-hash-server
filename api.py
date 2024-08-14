@@ -40,36 +40,40 @@ async def get_api_key(email: schema.UserEmail, db: Session = Depends(db.get_sess
         return {"email": new_user.email, "api_key": new_user.apikey}
 
 
-
-@app.post("/fishhash/", response_model=schema.FishHash)
-async def create_fishhash(fishhash: schema.FishHashCreate, db: Session = Depends(db.get_session)):
-    db_fishhash = crud.get_fishhash_by_email(db, email=fishhash.email)
-    if db_fishhash:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.create_fishhash(db=db, fishhash=fishhash)
-
-@app.get("/fishhash/{fishhash_id}", response_model=schema.FishHash)
-async def read_fishhash(fishhash_id: int, db: Session = Depends(db.get_session)):
-    db_fishhash = crud.get_fishhash(db, fishhash_id=fishhash_id)
-    if db_fishhash is None:
-        raise HTTPException(status_code=404, detail="FishHash not found")
-    return db_fishhash
-
-
 @app.post("/verify-docker-hash/")
 async def verify_docker_hash(data: schema.DockerHashRequest, db: Session = Depends(db.get_session)):
-    # 1. UserTable에서 email과 apikey가 매칭되는지 확인
-    db_user = crud.get_user_by_email_and_apikey(db, email=data.email, apikey=data.apikey)
+    # 1. UserTable에서 apikey가 매칭되는지 확인
+    db_user = crud.get_user_by_apikey(db, apikey=data.apikey)
     if not db_user:
-        raise HTTPException(status_code=403, detail="Invalid email or API key")
+        raise HTTPException(status_code=403, detail="Invalid API key")
 
-    # 2. FishHash 테이블에서 해당 email과 apikey로 데이터 검색
-    db_fishhash = crud.get_fishhash_by_email_and_docker_name(db, email=data.email, docker_image_name=data.docker_image_name)
+    # 2. FishHash 테이블에서 해당 apikey와 docker_image_name으로 데이터 검색
+    db_fishhash = crud.get_fishhash_by_apikey_and_docker_name(db, apikey=data.apikey, docker_image_name=data.docker_image_name)
     
     if not db_fishhash:
-        # 3. docker_image_name이 없다면 새로운 데이터를 삽입
+        # 3. docker_image_name이 존재하지 않는 경우
+        return {"status": "Docker image not found", "match": False}
+
+    # 4. docker_image_name이 있다면 hash 값을 비교하고 결과를 반환
+    if db_fishhash.docker_image_hash == data.docker_image_hash:
+        return {"status": "Hash matches", "match": True}
+    else:
+        return {"status": "Hash does not match", "match": False}
+
+
+@app.post("/register-docker-hash/")
+async def register_docker_hash(data: schema.DockerHashRequest, db: Session = Depends(db.get_session)):
+    # 1. UserTable에서 apikey가 존재하는지 확인
+    db_user = crud.get_user_by_apikey(db, apikey=data.apikey)
+    if not db_user:
+        raise HTTPException(status_code=403, detail="Invalid API key")
+
+    # 2. FishHash 테이블에서 apikey와 docker_image_name으로 데이터 검색
+    db_fishhash = crud.get_fishhash_by_apikey_and_docker_name(db, apikey=data.apikey, docker_image_name=data.docker_image_name)
+
+    if not db_fishhash:
+        # 3. 해당 docker_image_name이 존재하지 않으면 새로운 레코드를 추가
         new_fishhash = models.FishHash(
-            email=data.email,
             apikey=data.apikey,
             docker_image_name=data.docker_image_name,
             docker_image_hash=data.docker_image_hash
@@ -77,10 +81,10 @@ async def verify_docker_hash(data: schema.DockerHashRequest, db: Session = Depen
         db.add(new_fishhash)
         db.commit()
         db.refresh(new_fishhash)
-        return {"status": "Docker image and hash saved successfully."}
-
-    # 4. docker_image_name이 있다면 hash 값을 비교하고 결과를 반환
-    if db_fishhash.docker_image_hash == data.docker_image_hash:
-        return {"status": "Hash matches", "match": True}
+        return {"status": "Docker image and hash registered successfully."}
     else:
-        return {"status": "Hash does not match", "match": False}
+        # 4. 해당 docker_image_name이 이미 존재하면 docker_image_hash를 업데이트
+        db_fishhash.docker_image_hash = data.docker_image_hash
+        db.commit()
+        db.refresh(db_fishhash)
+        return {"status": "Docker image hash updated successfully."}
