@@ -6,8 +6,6 @@ from sqlalchemy.orm import Session
 from database import db
 import schema
 import models
-from typing import List  # List를 import 합니다.
-
 
 app = FastAPI()
 

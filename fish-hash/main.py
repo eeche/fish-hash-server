@@ -1,11 +1,17 @@
+import os
 import uvicorn
 import logging
 from database import db, Base
 import models  # 테이블 정의를 위한 임포트
 from sqlalchemy.orm import Session
-from config import MASTER_EMAIL, MASTER_APIKEY  # 마스터 계정 정보 불러오기
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
+
+MASTER_EMAIL = os.getenv('MASTER_EMAIL')
+MASTER_APIKEY = os.getenv('MASTER_APIKEY')
 
 def init_db():
     logging.info("PishHash API Server is starting...")

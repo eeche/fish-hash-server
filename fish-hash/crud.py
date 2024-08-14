@@ -1,18 +1,9 @@
-import hashlib
-import json
-import requests
 from sqlalchemy.orm import Session
 import models
 import schema
-from config import conf
-
-def write_access_data_in_db(access_id: str, access_item: schema.Access_Data, db: Session):
-    pass
-
-
 
 def create_fishhash(db: Session, fishhash: schema.FishHashCreate):
-    db_fishhash = models.FishHash(**fishhash.dict())
+    db_fishhash = models.FishHash(**fishhash.model_dump())
     db.add(db_fishhash)
     db.commit()
     db.refresh(db_fishhash)
@@ -42,7 +33,6 @@ def update_user_api_key(db: Session, email: str, api_key: str):
 #  모든 docker관련 api는 email이 필요없음
 #  register docker_image로 등록하는 api => 이미지 명 같든 틀리든 무조건 overwrite
 #  verify는 api_key, docker_image_name, docker_image_hash로 검증함
-#  
 
 def get_user_by_apikey(db: Session, apikey: str):
     return db.query(models.UserTable).filter(models.UserTable.apikey == apikey).first()
