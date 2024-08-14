@@ -6,7 +6,7 @@ from config import conf
 
 DB_PASSWORD = conf['dbpassword']
 
-DB_CONN= f'mysql+pymysql://root:{DB_PASSWORD}@localhost:3306/bob'
+DB_CONN= f'mysql+pymysql://root:{DB_PASSWORD}@db:3306/bob'
 
 class SQLAlchemy():
     def __init__(self):

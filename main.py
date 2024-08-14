@@ -8,6 +8,7 @@ from config import MASTER_EMAIL, MASTER_APIKEY  # 마스터 계정 정보 불러
 logging.basicConfig(level=logging.INFO)
 
 def init_db():
+    logging.info("PishHash API Server is starting...")
     try:
         # 데이터베이스에 테이블이 없는 경우 테이블 생성
         Base.metadata.create_all(bind=db.engine)

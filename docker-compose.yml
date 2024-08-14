@@ -5,21 +5,19 @@ services:
     image: mariadb:latest
     container_name: hashfish_mariadb
     environment:
-      # MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: bob  # 여기서 'bob' 데이터베이스를 미리 생성
+      MYSQL_DATABASE: bob
       MYSQL_ROOT_PASSWORD: password
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-    
+
 
   app:
-    build: .
+    build: hashfish:latest
     container_name: hashfish
-    command: uvicorn api:app --host 0.0.0.0 --port 8080
     environment:
-      DB_HOST: db
+      DB_HOST: db  # MariaDB 서비스의 이름을 사용해야 합니다.
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: password
@@ -30,9 +28,9 @@ services:
       - "8080:8080"
     depends_on:
       - db
-        
     volumes:
       - .:/app
+    command: sh -c "sleep 5 && /app/start.sh"
 
 volumes:
   db_data:
