@@ -2,7 +2,7 @@ import os.path
 import json
 import os
 
-if os.path.isfile('./conf/conf.json') is False:
+if os.path.isfile('/app/conf/conf.json') is False:
     with open('./conf/conf.json', 'w') as newconf:
         conf = json.load(newconf)
         conf['dbpassword']  = os.environ['DB_PASSWORD']
@@ -10,10 +10,12 @@ if os.path.isfile('./conf/conf.json') is False:
         conf['master_email'] = os.environ['MASTER_EMAIL']
         conf['master_apikey'] = os.environ['MASTER_APIKEY']
         json.dump(conf, newconf, indent=4)
+        
 
 with open('./conf/conf.json', 'r') as mainconf:
     conf = json.load(mainconf)
 
 
+print(conf['dbpassword'])
 MASTER_EMAIL = conf.get('master_email')
 MASTER_APIKEY = conf.get('master_apikey')
