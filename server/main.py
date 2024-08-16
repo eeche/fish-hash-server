@@ -16,7 +16,8 @@ MASTER_APIKEY = os.getenv('MASTER_APIKEY')
 def init_db():
     logging.info("PishHash API Server is starting...")
     try:
-        # 데이터베이스에 테이블이 없는 경우 테이블 생성
+        models.UserTable.__table__.create(db.engine, checkfirst=True)
+        models.Log.__table__.create(db.engine, checkfirst=True)
         Base.metadata.create_all(bind=db.engine)
         logging.info("Database tables created successfully or already exist.")
 
