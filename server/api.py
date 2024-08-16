@@ -49,16 +49,25 @@ async def verify_docker_hash(data: schema.DockerHashRequest, db: Session = Depen
 
     # 2. FishHash 테이블에서 해당 apikey와 docker_image_name으로 데이터 검색
     db_fishhash = crud.get_fishhash_by_apikey_and_docker_name(db, apikey=data.apikey, docker_image_name=data.docker_image_name)
-    
+
     if not db_fishhash:
         # 3. docker_image_name이 존재하지 않는 경우
-        return {"status": "Docker image not found", "match": False}
-
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Docker image not found", "match": False}
+        )
+    
     # 4. docker_image_name이 있다면 hash 값을 비교하고 결과를 반환
     if db_fishhash.docker_image_hash == data.docker_image_hash:
-        return {"status": "Hash matches", "match": True}
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Hash matches", "match": True}
+        )
     else:
-        return {"status": "Hash does not match", "match": False}
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Hash does not match", "match": False}
+        )
 
 
 @app.post("/api/register-docker-hash/")
