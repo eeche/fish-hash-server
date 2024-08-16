@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Key Login</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #065c92;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.7em;
+            color: #dd3333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #0a6ead;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>fish-hash-bowl</h1>
+        <h2>ADMIN</h2>
+        <p>Please enter your API key to view docker image logs</p>
+        <form id="apiKeyForm">
+            <input type="text" id="apiKeyInput" placeholder="Enter your API key" required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("apiKeyForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // 폼의 기본 제출 동작 방지
+
+            const apiKey = document.getElementById("apiKeyInput").value;
+
+            fetch("http://localhost:8080/api/get-logs", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ apikey: apiKey })
+            })
+            .then(response => response.json())
+            .then(data => {
+                localStorage.setItem("logsData", JSON.stringify(data.logs));
+                window.location.href = "http://localhost:8080/admin/logs";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>
