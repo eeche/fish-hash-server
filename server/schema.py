@@ -25,3 +25,8 @@ class DockerHashRequest(BaseModel):
     apikey: str
     docker_image_name: str
     docker_image_hash: str
+
+class LogRequest(BaseModel):
+    apikey :str
+
+    model_config = ConfigDict(from_attributes=True)

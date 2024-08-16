@@ -101,3 +101,12 @@ async def register_docker_hash(data: schema.DockerHashRequest, db: Session = Dep
         log_action(db, db_user.email, "register", "success", data.docker_image_name, data.docker_image_hash,data.apikey)
 
         return {"status": "Docker image hash updated successfully."}
+
+@app.post("/api/get-logs")
+async def get_logs(data: schema.LogRequest, db: Session = Depends(db.get_session)):
+    logs = crud.get_logs(db, apikey = data.apikey)
+
+    if not logs:
+        raise HTTPException(status_code=403, detail="No logs found for this API key or Invalid API key API key")
+
+    return {"logs":logs}
