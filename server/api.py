@@ -1,5 +1,7 @@
 import hashlib
 import os
+
+from fastapi.responses import JSONResponse
 import crud
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
@@ -47,16 +49,25 @@ async def verify_docker_hash(data: schema.DockerHashRequest, db: Session = Depen
 
     # 2. FishHash 테이블에서 해당 apikey와 docker_image_name으로 데이터 검색
     db_fishhash = crud.get_fishhash_by_apikey_and_docker_name(db, apikey=data.apikey, docker_image_name=data.docker_image_name)
-    
+
     if not db_fishhash:
         # 3. docker_image_name이 존재하지 않는 경우
-        return {"status": "Docker image not found", "match": False}
-
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Docker image not found", "match": False}
+        )
+    
     # 4. docker_image_name이 있다면 hash 값을 비교하고 결과를 반환
     if db_fishhash.docker_image_hash == data.docker_image_hash:
-        return {"status": "Hash matches", "match": True}
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Hash matches", "match": True}
+        )
     else:
-        return {"status": "Hash does not match", "match": False}
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Hash does not match", "match": False}
+        )
 
 
 @app.post("/api/register-docker-hash/")
@@ -79,10 +90,16 @@ async def register_docker_hash(data: schema.DockerHashRequest, db: Session = Dep
         db.add(new_fishhash)
         db.commit()
         db.refresh(new_fishhash)
-        return {"status": "Docker image and hash registered successfully."}
+        return JSONResponse(
+            status_code=201,
+            content={"message": "Docker image and hash registered successfully."}
+        )
     else:
         # 4. 해당 docker_image_name이 이미 존재하면 docker_image_hash를 업데이트
         db_fishhash.docker_image_hash = data.docker_image_hash
         db.commit()
         db.refresh(db_fishhash)
-        return {"status": "Docker image hash updated successfully."}
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Docker image hash updated successfully."}
+        )
