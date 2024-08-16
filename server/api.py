@@ -17,9 +17,9 @@ def generate_api_key(email: str) -> str:
     return api_key
 
 
-def log_action(db: Session, user_email: str, action: str, status: str, docker_image_name: str, docker_image_hash: str):
+def log_action(db: Session, email: str, action: str, status: str, docker_image_name: str, docker_image_hash: str):
     log_entry = models.Log(
-        user_email=user_email,
+        email=email,
         action=action,
         status=status,
         docker_image_name=docker_image_name,
