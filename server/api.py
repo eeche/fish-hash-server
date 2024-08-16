@@ -3,6 +3,7 @@ import os
 
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+
 import crud
 from fastapi import Depends, FastAPI, HTTPException,Request
 from sqlalchemy.orm import Session
@@ -14,12 +15,10 @@ app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
 
-
 def generate_api_key(email: str) -> str:
     random_string = os.urandom(32).hex()
     api_key = hashlib.sha256(f"{email}{random_string}".encode()).hexdigest()
     return api_key
-
 
 def log_action(db: Session, email: str, action: str, status: str, docker_image_name: str, docker_image_hash: str, apikey:str):
     log_entry = models.Log(
@@ -34,7 +33,6 @@ def log_action(db: Session, email: str, action: str, status: str, docker_image_n
     db.commit()
 
 
-
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -46,7 +44,6 @@ async def root(request: Request):
 @app.get("/admin/logs", response_class=HTMLResponse)
 async def get_logs_page(request: Request):
     return templates.TemplateResponse("showlogs.html", {"request": request})
-
 
 @app.post("/api/get-api-key/")
 async def get_api_key(email: schema.UserEmail, db: Session = Depends(db.get_session)):
@@ -62,7 +59,6 @@ async def get_api_key(email: schema.UserEmail, db: Session = Depends(db.get_sess
         db.refresh(new_user)
         return {"email": new_user.email, "api_key": new_user.apikey}
 
-
 @app.post("/api/verify-docker-hash/")
 async def verify_docker_hash(data: schema.DockerHashRequest, db: Session = Depends(db.get_session)):
     db_user = crud.get_user_by_apikey(db, apikey=data.apikey)
@@ -73,13 +69,21 @@ async def verify_docker_hash(data: schema.DockerHashRequest, db: Session = Depen
 
     if not db_fishhash:
         log_action(db, db_user.email, "verify", "failed", data.docker_image_name, data.docker_image_hash,data.apikey)
-        return {"status": "Docker image not found", "match": False}
+        return JSONResponse(
+            status_code=404,
+            content={"status": "Docker image not found", "match": False}
+        )
 
     match_status  = "success" if db_fishhash.docker_image_hash == data.docker_image_hash else "failed"
     log_action(db, db_user.email, "verify", match_status, data.docker_image_name, data.docker_image_hash,data.apikey)
     
-    return {"status": "Hash matches" if match_status == "success" else "Hash does not match", "match": match_status == "success"}
-
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": "Hash matches" if match_status == "success" else "Hash does not match",
+            "match": match_status == "success"
+        }
+    )
 
 @app.post("/api/register-docker-hash/")
 async def register_docker_hash(data: schema.DockerHashRequest, db: Session = Depends(db.get_session)):
@@ -102,14 +106,20 @@ async def register_docker_hash(data: schema.DockerHashRequest, db: Session = Dep
         db.refresh(new_fishhash)
         log_action(db, db_user.email, "register", "success", data.docker_image_name, data.docker_image_hash,data.apikey)
 
-        return {"status": "Docker image and hash registered successfully."}
+        return JSONResponse(
+            status_code=201,
+            content={"status": "Docker image and hash registered successfully."}
+        )
     else:
         db_fishhash.docker_image_hash = data.docker_image_hash
         db.commit()
         db.refresh(db_fishhash)
         log_action(db, db_user.email, "register", "success", data.docker_image_name, data.docker_image_hash,data.apikey)
 
-        return {"status": "Docker image hash updated successfully."}
+        return JSONResponse(
+            status_code=200,
+            content={"status": "Docker image hash updated successfully."}
+        )
 
 @app.post("/api/get-logs")
 async def get_logs(data: schema.LogRequest, db: Session = Depends(db.get_session)):
