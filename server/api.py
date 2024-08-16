@@ -1,9 +1,7 @@
 import hashlib
 import os
-
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-
 import crud
 from fastapi import Depends, FastAPI, HTTPException,Request
 from sqlalchemy.orm import Session
