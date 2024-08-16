@@ -39,3 +39,8 @@ def get_user_by_apikey(db: Session, apikey: str):
 
 def get_fishhash_by_apikey_and_docker_name(db: Session, apikey: str, docker_image_name: str):
     return db.query(models.FishHash).filter(models.FishHash.apikey == apikey, models.FishHash.docker_image_name == docker_image_name).first()
+
+def get_logs(db: Session,apikey: str):
+    # Logs 테이블에서 주어진 API 키와 매칭되는 모든 로그 데이터 검색
+    return db.query(models.Log).filter(models.Log.apikey == apikey).all()
+    
