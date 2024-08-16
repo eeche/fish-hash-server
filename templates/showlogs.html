@@ -104,6 +104,11 @@
                 logsContainer.appendChild(logEntry);
             });
         });
+
+        // 페이지를 떠날 때 로컬 스토리지에서 logsData 삭제
+        window.addEventListener("beforeunload", function() {
+            localStorage.removeItem("logsData");
+        });
     </script>
 </body>
 </html>

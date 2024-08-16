@@ -50,6 +50,7 @@
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            autocomplete: off;
         }
 
         button {
@@ -72,8 +73,8 @@
         <h1>fish-hash-bowl</h1>
         <h2>ADMIN</h2>
         <p>Please enter your API key to view docker image logs</p>
-        <form id="apiKeyForm">
-            <input type="text" id="apiKeyInput" placeholder="Enter your API key" required>
+        <form id="apiKeyForm" autocomplete="off">
+            <input type="text" id="apiKeyInput" placeholder="Enter your API key" required autocomplete="off">
             <button type="submit">Send</button>
         </form>
     </div>
@@ -100,6 +101,18 @@
                 console.error("Error:", error);
             });
         });
+
+        // 페이지 로드 시 입력 필드 초기화
+        window.onload = function() {
+            document.getElementById("apiKeyInput").value = '';
+        };
+
+        // 뒤로 가기 시 입력 필드 초기화
+        window.onpageshow = function(event) {
+            if (event.persisted || window.performance && window.performance.navigation.type == 2) {
+                document.getElementById("apiKeyInput").value = '';
+            }
+        };
     </script>
 </body>
 </html>

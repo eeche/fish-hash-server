@@ -13,7 +13,7 @@ services:
       - db_data:/var/lib/mysql
 
   app:
-    image: harksulim/fisihash:3
+    image: harksulim/fish-hash:latest
     container_name: hashfish
     environment:
       DB_HOST: ${DB_HOST}

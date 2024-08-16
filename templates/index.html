@@ -101,15 +101,27 @@
             } catch (error) {
                 apiKeyField.textContent = `Failed to get API Key: ${error.message}`;
                 apiKeyField.style.display = 'block';
+                
             }
+            setTimeout(() => {
+                apiKeyField.textContent = ``;
+                apiKeyField.style.display = 'none';
+                emailField.textContent = '';
+            }, 10000);
         }
+        window.onload = function() {
+            const apiKeyField = document.querySelector('.api-key');
+            apiKeyField.style.display = 'none'; 
+            emailField.textContent = '';
+        }
+
     </script>
 </head>
 <body>
     <div class="container">
         <h1>fish-hash-bowl</h1>
         <p>Please enter your Email address to get API key</p>
-        <form onsubmit="handleSubmit(event)">
+        <form autocomplete="off" onsubmit="handleSubmit(event)">
             <input type="email" name="email" placeholder="Enter your email"
                    pattern="^[a-zA-Z0-9](?!.*\.\.)[a-zA-Z0-9._+-]*[a-zA-Z0-9]@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$"
                    title="유효한 이메일 주소를 입력하세요. 첫 글자나 마지막 글자에 마침표를 사용할 수 없으며, 연속된 마침표도 허용되지 않습니다. 공백이나 허용되지 않은 특수 문자가 포함될 수 없습니다."
