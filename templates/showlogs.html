@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Key Login and Logs</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .header {
+            width: 100%;
+            background-color: #0a6ead;
+            color: white;
+            padding: 10px;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .container {
+            margin-top: 70px; /* 헤더 영역을 고려한 마진 */
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #0a6ead;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 2.5em;
+            color: #dd3333;
+            margin-bottom: 20px;
+        }
+
+        .logs {
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .log-entry {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            color: #333;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .timestamp {
+            font-weight: bold;
+            color: #0a6ead;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>fish-hash-logs</h1>
+    </div>
+
+    <div class="container">
+        <h1>fish-hash-bowl</h1>
+        <h2>ADMIN</h2>
+
+        <div class="logs" id="logsContainer">
+            <!-- 로그 데이터가 여기에 렌더링됩니다 -->
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const logsData = JSON.parse(localStorage.getItem("logsData"));
+
+            const logsContainer = document.getElementById("logsContainer");
+            logsContainer.innerHTML = "";
+
+            logsData.forEach(log => {
+                const logEntry = document.createElement("div");
+                logEntry.className = "log-entry";
+                logEntry.innerHTML = `<span class="timestamp">${log.timestamp}</span> - ${log.email}: ${log.action} - ${log.status} (${log.docker_image_name} / ${log.docker_image_hash})`;
+                logsContainer.appendChild(logEntry);
+            });
+        });
+
+        // 페이지를 떠날 때 로컬 스토리지에서 logsData 삭제
+        window.addEventListener("beforeunload", function() {
+            localStorage.removeItem("logsData");
+        });
+    </script>
+</body>
+</html>
