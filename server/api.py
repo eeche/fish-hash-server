@@ -1,9 +1,10 @@
 import hashlib
 import os
 
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 import crud
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException,Request
 from sqlalchemy.orm import Session
 from database import db
 import schema
@@ -11,6 +12,7 @@ import models
 
 app = FastAPI()
 
+templates = Jinja2Templates(directory="templates")
 
 
 def generate_api_key(email: str) -> str:
@@ -33,10 +35,17 @@ def log_action(db: Session, email: str, action: str, status: str, docker_image_n
 
 
 
-
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+async def root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/admin")
+async def root(request: Request):
+    return templates.TemplateResponse("APIkeyinput.html", {"request": request})
+
+@app.get("/admin/logs", response_class=HTMLResponse)
+async def get_logs_page(request: Request):
+    return templates.TemplateResponse("showlogs.html", {"request": request})
 
 
 @app.post("/api/get-api-key/")
