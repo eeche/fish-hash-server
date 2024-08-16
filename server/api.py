@@ -1,5 +1,7 @@
 import hashlib
 import os
+
+from fastapi.responses import JSONResponse
 import crud
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
@@ -59,7 +61,7 @@ async def verify_docker_hash(data: schema.DockerHashRequest, db: Session = Depen
         raise HTTPException(status_code=403, detail="Invalid API key")
 
     db_fishhash = crud.get_fishhash_by_apikey_and_docker_name(db, apikey=data.apikey, docker_image_name=data.docker_image_name)
-    
+
     if not db_fishhash:
         log_action(db, db_user.email, "verify", "failed", data.docker_image_name, data.docker_image_hash,data.apikey)
         return {"status": "Docker image not found", "match": False}
