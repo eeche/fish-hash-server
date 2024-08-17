@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+
+# Python cache files
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# IDE specific files
+.vscode
+.idea
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+
+# README and other documentation
+README.md
+
+# Test files
+**/test_*
+**/tests/
+
+# Local configuration file
+*.env
