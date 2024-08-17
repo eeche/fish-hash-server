@@ -1,10 +1,12 @@
 import os
 import uvicorn
 import logging
-from database import db, Base
-import models  # 테이블 정의를 위한 임포트
+import models
+import time
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import OperationalError
 from dotenv import load_dotenv
+from database import db, Base
 
 load_dotenv()
 
@@ -13,31 +15,39 @@ logging.basicConfig(level=logging.INFO)
 MASTER_EMAIL = os.getenv('MASTER_EMAIL')
 MASTER_APIKEY = os.getenv('MASTER_APIKEY')
 
-def init_db():
-    logging.info("PishHash API Server is starting...")
-    try:
-        models.UserTable.__table__.create(db.engine, checkfirst=True)
-        models.Log.__table__.create(db.engine, checkfirst=True)
-        Base.metadata.create_all(bind=db.engine)
-        logging.info("Database tables created successfully or already exist.")
-
-        # 마스터 계정 추가 로직
-        session = db.Session()
+def init_db(max_retries=5, retry_interval=5):
+    logging.info("FishHash API Server is starting...")
+    retries = 0
+    while retries < max_retries:
         try:
-            add_master_account(session)
-        finally:
-            session.close()
+            models.UserTable.__table__.create(db.engine, checkfirst=True)
+            models.Log.__table__.create(db.engine, checkfirst=True)
+            Base.metadata.create_all(bind=db.engine)
+            logging.info("Database tables created successfully or already exist.")
 
-    except Exception as e:
-        logging.error("Failed to initialize database.")
-        logging.error(str(e))
-        raise  # 예외를 다시 발생시켜 서버 시작을 중단할지 선택할 수 있음
+            session = db.Session()
+            try:
+                add_master_account(session)
+            finally:
+                session.close()
+            
+            logging.info("Database initialization successful.")
+            return  # 성공적으로 초기화되면 함수 종료
+        except OperationalError as e:
+            retries += 1
+            logging.warning(f"Database connection failed. Retrying in {retry_interval} seconds... (Attempt {retries}/{max_retries})")
+            time.sleep(retry_interval)
+        except Exception as e:
+            logging.error("Failed to initialize database.")
+            logging.error(str(e))
+            raise
+
+    logging.error(f"Failed to connect to the database after {max_retries} attempts. Exiting...")
+    raise Exception("Database connection failed")
 
 def add_master_account(session: Session):
-    # 마스터 계정이 이미 존재하는지 확인
     user = session.query(models.UserTable).filter_by(email=MASTER_EMAIL).first()
     if not user:
-        # 마스터 계정이 존재하지 않으면 새로 추가
         new_user = models.UserTable(email=MASTER_EMAIL, apikey=MASTER_APIKEY)
         session.add(new_user)
         session.commit()
@@ -47,8 +57,7 @@ def add_master_account(session: Session):
 
 if __name__ == '__main__':
     try:
-        # 서버 시작 전에 데이터베이스 초기화
-        init_db()
+        init_db()  # 재시도 로직이 포함된 init_db 호출
 
         LOG = 'debug'
         if LOG == 'debug':

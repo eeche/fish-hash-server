@@ -29,7 +29,7 @@ services:
       - db
     volumes:
       - .:/app
-    command: sh -c "sleep 10 && python3 server/main.py"
+    command: ["python3", "server/main.py"]
 
 volumes:
   db_data:
