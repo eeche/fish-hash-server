@@ -13,7 +13,8 @@ services:
       - db_data:/var/lib/mysql
 
   app:
-    image: harksulim/fish-hash:latest
+    # image: harksulim/fish-hash:latest
+    image: eeche/fish-hash:latest
     container_name: hashfish
     environment:
       DB_HOST: ${DB_HOST}
