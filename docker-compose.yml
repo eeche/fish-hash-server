@@ -14,7 +14,7 @@ services:
 
   app:
     # image: harksulim/fish-hash:latest
-    image: eeche/fish-hash:latest
+    image: eeche/fish-hash-server:latest
     container_name: hashfish
     environment:
       DB_HOST: ${DB_HOST}
