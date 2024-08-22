@@ -1,15 +1,24 @@
 import hashlib
 import os
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
 import crud
-from fastapi import Depends, FastAPI, HTTPException,Request
-from sqlalchemy.orm import Session
-from database import db
 import schema
 import models
+from database import db
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Depends, FastAPI, HTTPException,Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 모든 origin을 허용합니다. 프로덕션에서는 특정 origin만 허용하는 것이 좋습니다.
+    allow_credentials=True,
+    allow_methods=["*"],  # 모든 HTTP 메서드를 허용합니다.
+    allow_headers=["*"],  # 모든 헤더를 허용합니다.
+)
 
 templates = Jinja2Templates(directory="templates")
 
